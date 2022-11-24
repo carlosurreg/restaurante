@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 
 #IMPORTAR EL FORMULARIO A RENDER
 from web.formularios.formularioPlatos import FormularioPlatos
 from web.formularios.formularioempleados import formularioEmpleados
+from web.formularios.formularioEditarPlato import FormularioEditarPlatos
+from web.formularios.formularioEditarEmpleado import FormularioEditarEmpleados
 
-from web.models import Platos
+from web.models import Platos, Empleados
 
 # Create your views here.
 #las vistas en djangp son los CONTROLADORES
@@ -14,6 +16,84 @@ from web.models import Platos
 
 def Home(request):
     return render(request,'index.html')
+
+def empleados(request):
+    empleadosConsultados = Empleados.objects.all()
+    formulario = FormularioEditarEmpleados()
+    diccionarioEnviado = {
+        'empleados' : empleadosConsultados,
+        'formulario' : formulario
+    }
+    return render(request, 'empleados.html', diccionarioEnviado)
+
+def MenuPlatos(request):
+    platosConsultados = Platos.objects.all()
+    formulario = FormularioEditarPlatos()
+    diccionarioEnvio = {
+        'platos' : platosConsultados,
+        'formulario' : formulario
+    }
+    return render(request, 'menuPlatos.html', diccionarioEnvio)
+
+
+def EditarPlato(request, id):
+    #Recibir los datos del formulario y editar mi plato
+    print(id)
+    if request.method == 'POST':
+        datosDelFormulario = FormularioEditarPlatos(request.POST)
+        if datosDelFormulario.is_valid():
+            datosPlato = datosDelFormulario.cleaned_data
+            try:
+                Platos.objects.filter(pk = id).update(precio = datosPlato["precioPlato"])
+                print("EXITO GUARDANDO LOS DATOS")
+            except Exception as error:
+                print("error",error)
+    return redirect('menu')
+
+def EditarEmpleado(request, id):
+    print(id)
+    if request.method == 'POST':
+        datosDelFormulario = FormularioEditarEmpleados(request.POST)
+        if datosDelFormulario.is_valid():
+            datosEmpleado = datosDelFormulario.cleaned_data
+            try:
+                Empleados.objects.filter(pk = id).update(salario = datosEmpleado["salarioEmpleados"])
+                Empleados.objects.filter(pk = id).update(contacto = datosEmpleado["contactoEmpleados"])
+                print("EXITO GUARDANDO LOS DATOS")
+            except Exception as error:
+                print("error", error)
+    return redirect('empleados')
+
+
+def VistaEmpleados(request):
+    formulario = formularioEmpleados()
+    datosParaTemples = {
+        'formularioRegistro':formulario,
+        'bandera':False
+    }
+    if request.method == 'POST':
+        datosDelFormulario = formularioEmpleados(request.POST)
+        if datosDelFormulario.is_valid():
+            datosEmpleados = datosDelFormulario.cleaned_data
+            empleadosNuevo = Empleados(
+                nombres = datosEmpleados["nombresEmpleados"],
+                apellidos = datosEmpleados["apellidosEmpleados"],
+                foto = datosEmpleados["fotoEmpleados"],
+                cargo = datosEmpleados["cargoEmpleados"],
+                salario = datosEmpleados["salarioEmpleados"],
+                contacto = datosEmpleados["contactoEmpleados"],
+            )
+            try:
+                empleadosNuevo.save()
+                datosParaTemples["bandera"] = True
+                print("EXITO GUARDANDO LOS DATOS")
+            
+            except Exception as error:
+                datosParaTemples["bandera"] = False
+                print("error", error)
+    return render(request, 'empleados.html', datosParaTemples)
+
+
 
 def VistaPlatos(request):
 
@@ -52,11 +132,6 @@ def VistaPlatos(request):
 
     return render(request,'platos.html',datosParaTemplate)
 
-def VistaPersonal(request):
-        formulario=formularioEmpleados()
-        datosParaTemplate={
-            'formularioEmpleados':formulario,
-        }
-        return render(request,'personal.html',datosParaTemplate)
+
         
 
