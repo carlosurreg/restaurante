@@ -1,6 +1,6 @@
 from django import forms
 
-class FormularioEditarEmpleados(forms.form):
+class FormularioEditarEmpleados(forms.Form):
 
     salarioEmpleados = forms.CharField(
         widget= forms.NumberInput(attrs = {'class':'form-control mb-3'}),

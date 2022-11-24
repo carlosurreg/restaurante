@@ -76,12 +76,12 @@ def VistaEmpleados(request):
         if datosDelFormulario.is_valid():
             datosEmpleados = datosDelFormulario.cleaned_data
             empleadosNuevo = Empleados(
-                nombres = datosEmpleados["nombresEmpleados"],
-                apellidos = datosEmpleados["apellidosEmpleados"],
-                foto = datosEmpleados["fotoEmpleados"],
-                cargo = datosEmpleados["cargoEmpleados"],
-                salario = datosEmpleados["salarioEmpleados"],
-                contacto = datosEmpleados["contactoEmpleados"],
+                nombres = datosEmpleados["nombres"],
+                apellidos = datosEmpleados["apellidos"],
+                foto = datosEmpleados["foto"],
+                cargo = datosEmpleados["cargo"],
+                salario = datosEmpleados["salario"],
+                contacto = datosEmpleados["contacto"],
             )
             try:
                 empleadosNuevo.save()
